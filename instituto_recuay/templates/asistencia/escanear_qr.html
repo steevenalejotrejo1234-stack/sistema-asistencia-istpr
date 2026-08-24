@@ -1,0 +1,117 @@
+﻿{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Escanear QR{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-qr-code-scan me-2"></i>Escanear QR de Asistencia</h2>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Instrucciones</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li class="mb-2"><strong>Escanea el codigo QR</strong> que te proporciona tu docente usando la camara de tu dispositivo.</li>
+                        <li class="mb-2"><strong>Ingresa el codigo de validacion</strong> de 6 caracteres que el docente muestra en pantalla.</li>
+                        <li class="mb-2"><strong>Confirma tu asistencia</strong> y se registrara automaticamente.</li>
+                    </ol>
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        <strong>Importante:</strong> El codigo de validacion cambia en cada sesion. Asegurate de tenerlo antes de escanear.
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-qr-code me-2"></i>Registrar Asistencia QR</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post" action="{% url 'asistencia:validar_qr_ajax' %}" id="form-validar-qr" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="token_qr" id="token_qr" value="">
+
+                        <div class="mb-4 text-center">
+                            <div id="qr-scanner-status" class="alert alert-secondary">
+                                <i class="bi bi-camera me-2"></i>Camara no activa
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="codigo_validacion" class="form-label fw-bold">
+                                <i class="bi bi-key me-1"></i>Codigo de Validacion <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" name="codigo_validacion" id="codigo_validacion"
+                                   class="form-control form-control-lg text-center fw-bold"
+                                   style="letter-spacing: 5px; font-size: 1.5rem;"
+                                   placeholder="XXXXXX" maxlength="6" required>
+                            <div class="form-text">Ingrese el codigo de 6 caracteres mostrado por el docente.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'asistencia:escanear_qr_camara' %}" class="btn btn-info text-white btn-lg" id="btn-camara">
+                                <i class="bi bi-camera me-2"></i>Escanear con Camara
+                            </a>
+                            <button type="submit" class="btn btn-primary btn-lg" id="btn-manual">
+                                <i class="bi bi-key me-2"></i>Registrar con Codigo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var tokenInput = document.getElementById('token_qr');
+        var urlParams = new URLSearchParams(window.location.search);
+        var tokenFromUrl = urlParams.get('token');
+        if (tokenFromUrl) {
+            tokenInput.value = tokenFromUrl;
+            document.getElementById('qr-scanner-status').innerHTML = '<i class="bi bi-check-circle me-2 text-success"></i>Token QR detectado correctamente';
+            document.getElementById('qr-scanner-status').className = 'alert alert-success';
+        }
+
+        document.getElementById('form-validar-qr').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var form = this;
+            var formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    window.location.href = data.redirect_url || '{% url "asistencia:mis_asistencias" %}';
+                } else {
+                    alert(data.message || 'Error al validar la asistencia. Verifique el codigo de validacion.');
+                }
+            })
+            .catch(function() {
+                alert('Error de conexion. Intente de nuevo.');
+            });
+        });
+    });
+</script>
+{% endblock %}

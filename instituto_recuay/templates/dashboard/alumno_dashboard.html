@@ -1,0 +1,328 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Mi Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1 fw-bold text-dark">
+                <i class="fas fa-user-graduate me-2 text-info"></i>Mi Panel
+            </h2>
+            <p class="text-muted mb-0">Bienvenido, {{ user.get_full_name }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'asistencia:escanear_qr' %}" class="btn btn-primary">
+                <i class="fas fa-qrcode me-1"></i> Escanear QR
+            </a>
+            <a href="{% url 'asistencia:crear_justificacion' %}" class="btn btn-warning text-dark">
+                <i class="fas fa-file-alt me-1"></i> Enviar Justificacion
+            </a>
+        </div>
+    </div>
+
+    {% if justificaciones_pendientes > 0 %}
+    <div class="alert alert-warning d-flex align-items-center mb-4" role="alert" style="border-radius: 12px; border-left: 4px solid #f39c12;">
+        <i class="fas fa-exclamation-triangle fa-lg me-3"></i>
+        <div>
+            <strong>Justificaciones pendientes:</strong> Tienes {{ justificaciones_pendientes }} justificacion(es) pendiente(s) de respuesta.
+            <a href="{% url 'asistencia:lista_justificaciones' %}" class="alert-link ms-1">Ver justificaciones <i class="fas fa-arrow-right ms-1"></i></a>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 50px; height: 50px; background: linear-gradient(135deg, #8e44ad, #6c3483);">
+                        <i class="fas fa-book fa-lg text-white"></i>
+                    </div>
+                    <h6 class="text-muted mb-1 fw-normal" style="font-size: 12px;">Mis Cursos</h6>
+                    <h4 class="mb-0 fw-bold text-dark">{{ inscripciones.count|default:"0" }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 50px; height: 50px; background: linear-gradient(135deg, #27ae60, #1e8449);">
+                        <i class="fas fa-check fa-lg text-white"></i>
+                    </div>
+                    <h6 class="text-muted mb-1 fw-normal" style="font-size: 12px;">Presentes</h6>
+                    <h4 class="mb-0 fw-bold" style="color: #27ae60;">{{ presentes|default:"0" }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 50px; height: 50px; background: linear-gradient(135deg, #f39c12, #d68910);">
+                        <i class="fas fa-clock fa-lg text-white"></i>
+                    </div>
+                    <h6 class="text-muted mb-1 fw-normal" style="font-size: 12px;">Tardanzas</h6>
+                    <h4 class="mb-0 fw-bold" style="color: #f39c12;">{{ tardanzas|default:"0" }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 50px; height: 50px; background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                        <i class="fas fa-times fa-lg text-white"></i>
+                    </div>
+                    <h6 class="text-muted mb-1 fw-normal" style="font-size: 12px;">Faltas</h6>
+                    <h4 class="mb-0 fw-bold" style="color: #e74c3c;">{{ faltas|default:"0" }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 50px; height: 50px; background: linear-gradient(135deg, #3498db, #2471a3);">
+                        <i class="fas fa-file-alt fa-lg text-white"></i>
+                    </div>
+                    <h6 class="text-muted mb-1 fw-normal" style="font-size: 12px;">Justificados</h6>
+                    <h4 class="mb-0 fw-bold" style="color: #3498db;">{{ justificados|default:"0" }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body text-center">
+                    <div class="d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 50px; height: 50px; background: linear-gradient(135deg, #2c3e50, #1a252f);">
+                        <i class="fas fa-calendar-check fa-lg text-white"></i>
+                    </div>
+                    <h6 class="text-muted mb-1 fw-normal" style="font-size: 12px;">Total Clases</h6>
+                    <h4 class="mb-0 fw-bold text-dark">{{ total_clases|default:"0" }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-chart-pie me-2 text-info"></i>Mi Asistencia
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4 d-flex flex-column align-items-center justify-content-center">
+                    <div class="circular-progress-wrapper mb-3" style="position: relative; width: 180px; height: 180px;">
+                        <svg viewBox="0 0 180 180" style="width: 180px; height: 180px; transform: rotate(-90deg);">
+                            <circle cx="90" cy="90" r="78" fill="none" stroke="#e9ecef" stroke-width="12"></circle>
+                            <circle cx="90" cy="90" r="78" fill="none"
+                                stroke="{% if porcentaje_asistencia >= 75 %}#27ae60{% elif porcentaje_asistencia >= 50 %}#f39c12{% else %}#e74c3c{% endif %}"
+                                stroke-width="12"
+                                stroke-linecap="round"
+                                stroke-dasharray="{{ porcentaje_asistencia|floatformat:0 }} 490"
+                                style="transition: stroke-dasharray 1s ease-in-out;">
+                            </circle>
+                        </svg>
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <h2 class="mb-0 fw-bold" style="font-size: 32px; color: {% if porcentaje_asistencia >= 75 %}#27ae60{% elif porcentaje_asistencia >= 50 %}#f39c12{% else %}#e74c3c{% endif %};">
+                                {{ porcentaje_asistencia }}%
+                            </h2>
+                            <small class="text-muted">Asistencia</small>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        {% if porcentaje_asistencia >= 75 %}
+                            <span class="badge bg-success rounded-pill px-3 py-2">
+                                <i class="fas fa-check-circle me-1"></i>Asistencia Aprobada
+                            </span>
+                        {% elif porcentaje_asistencia >= 50 %}
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Asistencia en Riesgo
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger rounded-pill px-3 py-2">
+                                <i class="fas fa-times-circle me-1"></i>Asistencia Insuficiente
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-book me-2 text-primary"></i>Mis Cursos Inscritos
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 fw-semibold">Curso</th>
+                                    <th class="border-0 fw-semibold">Codigo</th>
+                                    <th class="border-0 fw-semibold">Ciclo</th>
+                                    <th class="border-0 fw-semibold">Creditos</th>
+                                    <th class="border-0 fw-semibold">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inscripcion in inscripciones %}
+                                <tr>
+                                    <td class="fw-semibold">{{ inscripcion.curso.nombre }}</td>
+                                    <td><span class="badge bg-light text-dark">{{ inscripcion.curso.codigo }}</span></td>
+                                    <td>
+                                        <span class="text-muted">
+                                            Ciclo {{ inscripcion.curso.ciclo.numero }}
+                                        </span>
+                                    </td>
+                                    <td>{{ inscripcion.curso.creditos }}</td>
+                                    <td>
+                                        <span class="badge bg-success rounded-pill">Inscrito</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <i class="fas fa-book-open fa-2x mb-2 d-block" style="opacity: 0.3;"></i>
+                                        No estas inscrito en ningun curso actualmente.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-bolt me-2 text-warning"></i>Acciones Rapidas
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'asistencia:escanear_qr' %}" class="btn btn-outline-primary text-start py-3">
+                            <i class="fas fa-qrcode me-2"></i>
+                            <span>Escanear QR de Asistencia</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'asistencia:escanear_qr_camara' %}" class="btn btn-outline-info text-start py-3">
+                            <i class="fas fa-camera me-2"></i>
+                            <span>Escanear con Camara</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'asistencia:crear_justificacion' %}" class="btn btn-outline-warning text-start py-3">
+                            <i class="fas fa-file-alt me-2"></i>
+                            <span>Enviar Justificacion</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'asistencia:mis_asistencias' %}" class="btn btn-outline-success text-start py-3">
+                            <i class="fas fa-clipboard-list me-2"></i>
+                            <span>Ver Mis Asistencias</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'asistencia:lista_justificaciones' %}" class="btn btn-outline-secondary text-start py-3">
+                            <i class="fas fa-file-signature me-2"></i>
+                            <span>Mis Justificaciones</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'usuarios:mi_perfil' %}" class="btn btn-outline-dark text-start py-3">
+                            <i class="fas fa-user-edit me-2"></i>
+                            <span>Mi Perfil</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fas fa-history me-2 text-primary"></i>Historial de Asistencia
+                        </h6>
+                        <a href="{% url 'asistencia:mis_asistencias' %}" class="btn btn-sm btn-outline-primary">
+                            Ver todo <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 fw-semibold">Curso</th>
+                                    <th class="border-0 fw-semibold">Fecha</th>
+                                    <th class="border-0 fw-semibold">Hora</th>
+                                    <th class="border-0 fw-semibold">Estado</th>
+                                    <th class="border-0 fw-semibold">Metodo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asistencia in asistencias_recientes %}
+                                <tr>
+                                    <td class="fw-semibold">{{ asistencia.curso.nombre }}</td>
+                                    <td>{{ asistencia.fecha|date:"d/m/Y" }}</td>
+                                    <td>{{ asistencia.hora_entrada|time:"H:i" }}</td>
+                                    <td>
+                                        {% if asistencia.estado == 'P' %}
+                                            <span class="badge bg-success rounded-pill px-3 py-2">Presente</span>
+                                        {% elif asistencia.estado == 'T' %}
+                                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Tardanza</span>
+                                        {% elif asistencia.estado == 'F' %}
+                                            <span class="badge bg-danger rounded-pill px-3 py-2">Falta</span>
+                                        {% elif asistencia.estado == 'J' %}
+                                            <span class="badge bg-info rounded-pill px-3 py-2">Justificado</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary rounded-pill px-3 py-2">Permiso</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if asistencia.metodo_registro == 'QR' %}
+                                            <span class="badge bg-light text-dark"><i class="fas fa-qrcode me-1"></i>QR</span>
+                                        {% elif asistencia.metodo_registro == 'M' %}
+                                            <span class="badge bg-light text-dark"><i class="fas fa-hand-pointer me-1"></i>Manual</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark"><i class="fas fa-cog me-1"></i>Sistema</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <i class="fas fa-calendar-times fa-2x mb-2 d-block" style="opacity: 0.3;"></i>
+                                        No hay registros de asistencia aun.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .circular-progress-wrapper svg circle {
+        transition: stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+</style>
+{% endblock %}

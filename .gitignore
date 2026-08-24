@@ -1,0 +1,65 @@
+# Python
+*.pyc
+*.pyo
+*.pyd
+.Python
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+*.whl
+*.manifest
+*.spec
+
+# Virtual environments
+.venv
+env/
+venv/
+ENV/
+
+# Environment secrets
+.env
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+staticfiles_collected/
+local_settings.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Misc
+*.bak
+*.tmp
+*.temp
+*.orig
+*.rej
+*.pot
+*.mo
+
+# Server outputs
+server_error.txt
+server_error2.txt
+server_output.txt

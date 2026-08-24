@@ -1,0 +1,323 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ISTPR - Sistema de Gestion Academica y Control de Asistencia">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}ISTPR - Sistema de Asistencia{% endblock %}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link href="{% static 'css/style.css' %}" rel="stylesheet">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  {% if user.is_authenticated %}
+
+  <aside class="sidebar d-none d-lg-flex flex-column" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div class="brand-text">
+        <h5>ISTPR</h5>
+        <small>Instituto Superior Tecnologico<br>Publico de Recuay</small>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav flex-grow-1">
+      <div class="nav-section">Principal</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'dashboard:admin_dashboard' %}">
+            <i class="fas fa-tachometer-alt"></i><span>Dashboard</span>
+          </a>
+        </li>
+      </ul>
+
+      {% if user.rol == 'admin' or user.rol == 'super_admin' or user.rol == 'director' %}
+      <div class="nav-section">Gestion de Usuarios</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'usuarios:lista_usuarios' %}">
+            <i class="fas fa-users"></i><span>Usuarios</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-section">Gestion Academica</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'academica:lista_carreras' %}">
+            <i class="fas fa-graduation-cap"></i><span>Carreras</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'academica:lista_ciclos' %}">
+            <i class="fas fa-calendar-alt"></i><span>Ciclos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'academica:lista_cursos' %}">
+            <i class="fas fa-book"></i><span>Cursos</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'academica:lista_horarios' %}">
+            <i class="fas fa-clock"></i><span>Horarios</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'academica:lista_asignaciones' %}">
+            <i class="fas fa-link"></i><span>Asignaciones</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'academica:lista_inscripciones' %}">
+            <i class="fas fa-user-plus"></i><span>Inscripciones</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'academica:lista_tolerancias' %}">
+            <i class="fas fa-hourglass-half"></i><span>Tolerancias</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-section">Control de Asistencia</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:registrar_asistencia' %}">
+            <i class="fas fa-clipboard-check"></i><span>Registrar Asistencia</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:historial_asistencias' %}">
+            <i class="fas fa-history"></i><span>Historial</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:lista_justificaciones' %}">
+            <i class="fas fa-file-alt"></i><span>Justificaciones</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:escanear_qr' %}">
+            <i class="fas fa-qrcode"></i><span>Escanear QR</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-section">Reportes</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'reportes:reporte_estadistico' %}">
+            <i class="fas fa-chart-bar"></i><span>Estadisticas</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'reportes:generar_qr_masivo' %}">
+            <i class="fas fa-qrcode"></i><span>QR Masivo</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'auditoria:lista_auditoria' %}">
+            <i class="fas fa-shield-alt"></i><span>Auditoria</span>
+          </a>
+        </li>
+      </ul>
+
+      {% elif user.rol == 'docente' %}
+      <div class="nav-section">Mis Clases</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:crear_sesion_qr' %}">
+            <i class="fas fa-qrcode"></i><span>Crear Sesion QR</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:registrar_asistencia' %}">
+            <i class="fas fa-clipboard-check"></i><span>Registrar Asistencia</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:historial_asistencias' %}">
+            <i class="fas fa-history"></i><span>Historial</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:lista_justificaciones' %}">
+            <i class="fas fa-file-alt"></i><span>Justificaciones</span>
+          </a>
+        </li>
+      </ul>
+
+      {% elif user.rol == 'alumno' %}
+      <div class="nav-section">Mi Asistencia</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:mis_asistencias' %}">
+            <i class="fas fa-clipboard-check"></i><span>Mis Asistencias</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:escanear_qr' %}">
+            <i class="fas fa-qrcode"></i><span>Escanear QR</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:escanear_qr_camara' %}">
+            <i class="fas fa-camera"></i><span>QR con Camara</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:crear_justificacion' %}">
+            <i class="fas fa-file-alt"></i><span>Nueva Justificacion</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'asistencia:lista_justificaciones' %}">
+            <i class="fas fa-list"></i><span>Mis Justificaciones</span>
+          </a>
+        </li>
+      </ul>
+      {% endif %}
+
+      <div class="nav-section">Mi Cuenta</div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'usuarios:mi_perfil' %}">
+            <i class="fas fa-user-circle"></i><span>Mi Perfil</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'notificaciones:lista_notificaciones' %}">
+            <i class="fas fa-bell"></i><span>Notificaciones</span>
+            {% if notificaciones_no_leidas %}
+            <span class="badge bg-danger ms-auto">{{ notificaciones_no_leidas }}</span>
+            {% endif %}
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+      &copy; 2026 ISTPR &mdash; v1.0
+    </div>
+  </aside>
+
+  <!-- Offcanvas Sidebar (Mobile) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMobile">
+    <div class="offcanvas-header bg-primary-custom">
+      <h6 class="offcanvas-title text-white fw-bold"><i class="fas fa-graduation-cap me-2"></i>ISTPR</h6>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body p-0">
+      <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link" href="{% url 'dashboard:admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+          {% if user.rol == 'admin' or user.rol == 'super_admin' or user.rol == 'director' %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:lista_usuarios' %}"><i class="fas fa-users"></i><span>Usuarios</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'academica:lista_carreras' %}"><i class="fas fa-graduation-cap"></i><span>Carreras</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'academica:lista_ciclos' %}"><i class="fas fa-calendar-alt"></i><span>Ciclos</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'academica:lista_cursos' %}"><i class="fas fa-book"></i><span>Cursos</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'academica:lista_horarios' %}"><i class="fas fa-clock"></i><span>Horarios</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'academica:lista_asignaciones' %}"><i class="fas fa-link"></i><span>Asignaciones</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'academica:lista_inscripciones' %}"><i class="fas fa-user-plus"></i><span>Inscripciones</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'academica:lista_tolerancias' %}"><i class="fas fa-hourglass-half"></i><span>Tolerancias</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:historial_asistencias' %}"><i class="fas fa-history"></i><span>Historial</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:lista_justificaciones' %}"><i class="fas fa-file-alt"></i><span>Justificaciones</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'reportes:reporte_estadistico' %}"><i class="fas fa-chart-bar"></i><span>Reportes</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'auditoria:lista_auditoria' %}"><i class="fas fa-shield-alt"></i><span>Auditoria</span></a></li>
+          {% elif user.rol == 'docente' %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:crear_sesion_qr' %}"><i class="fas fa-qrcode"></i><span>Crear Sesion QR</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:historial_asistencias' %}"><i class="fas fa-history"></i><span>Historial</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:lista_justificaciones' %}"><i class="fas fa-file-alt"></i><span>Justificaciones</span></a></li>
+          {% elif user.rol == 'alumno' %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:mis_asistencias' %}"><i class="fas fa-clipboard-check"></i><span>Mis Asistencias</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:escanear_qr' %}"><i class="fas fa-qrcode"></i><span>Escanear QR</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:crear_justificacion' %}"><i class="fas fa-file-alt"></i><span>Nueva Justificacion</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'asistencia:lista_justificaciones' %}"><i class="fas fa-list"></i><span>Mis Justificaciones</span></a></li>
+          {% endif %}
+          <li class="nav-item"><a class="nav-link" href="{% url 'usuarios:mi_perfil' %}"><i class="fas fa-user-circle"></i><span>Mi Perfil</span></a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'notificaciones:lista_notificaciones' %}"><i class="fas fa-bell"></i><span>Notificaciones</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <header class="top-navbar">
+      <button class="sidebar-toggle d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMobile">
+        <i class="fas fa-bars"></i>
+      </button>
+      <button class="sidebar-toggle d-none d-lg-flex" type="button" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="navbar-actions ms-auto d-flex align-items-center gap-2">
+        <button class="btn-icon" id="darkModeToggle" title="Cambiar tema" onclick="toggleDarkMode()">
+          <i class="fas fa-moon" id="darkModeIcon"></i>
+        </button>
+
+        <a href="{% url 'notificaciones:lista_notificaciones' %}" class="btn-icon position-relative" title="Notificaciones">
+          <i class="fas fa-bell"></i>
+          {% if notificaciones_no_leidas %}
+          <span class="badge-notification" id="notifBadge">{{ notificaciones_no_leidas }}</span>
+          {% endif %}
+        </a>
+
+        <div class="dropdown">
+          <button class="btn d-flex align-items-center gap-2 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <div class="rounded-circle bg-primary-custom d-flex align-items-center justify-content-center text-white" style="width:32px;height:32px;font-size:0.8rem;">
+              {{ user.iniciales }}
+            </div>
+            <span class="d-none d-md-inline fw-semibold" style="font-size:0.85rem;">{{ user.get_full_name|default:user.username }}</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><span class="dropdown-item-text fw-semibold">{{ user.get_full_name }}</span></li>
+            <li><span class="dropdown-item-text text-muted small">{{ user.get_rol_display }}</span></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'usuarios:mi_perfil' %}"><i class="fas fa-user-circle me-2"></i>Mi Perfil</a></li>
+            <li><a class="dropdown-item" href="{% url 'usuarios:cambiar_password' %}"><i class="fas fa-key me-2"></i>Cambiar Password</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="{% url 'dashboard:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesion</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    {% if messages %}
+    <div class="px-3 pt-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {% if message.tags == 'success' %}<i class="fas fa-check-circle me-2"></i>
+        {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle me-2"></i>
+        {% elif message.tags == 'warning' %}<i class="fas fa-exclamation-triangle me-2"></i>
+        {% else %}<i class="fas fa-info-circle me-2"></i>{% endif %}
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container-fluid py-3 px-3 px-lg-4">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+  {% else %}
+
+  {% block content_auth %}{% endblock %}
+
+  {% endif %}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+
+</body>
+</html>

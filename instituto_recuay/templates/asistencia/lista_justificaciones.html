@@ -1,0 +1,165 @@
+﻿{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Justificaciones{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-earmark-text me-2"></i>Justificaciones</h2>
+        <a href="{% url 'asistencia:crear_justificacion' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i>Nueva Justificacion
+        </a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="alumno" class="form-label fw-bold">Alumno</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="alumno" id="alumno" class="form-control"
+                               placeholder="Nombre del alumno..." value="{{ request.GET.alumno|default:'' }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label for="curso" class="form-label fw-bold">Curso</label>
+                    <select name="curso" id="curso" class="form-select">
+                        <option value="">Todos</option>
+                        {% for curso in cursos %}
+                        <option value="{{ curso.pk }}" {% if request.GET.curso == curso.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ curso.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="estado" class="form-label fw-bold">Estado</label>
+                    <select name="estado" id="estado" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="P" {% if request.GET.estado == 'P' %}selected{% endif %}>Pendiente</option>
+                        <option value="A" {% if request.GET.estado == 'A' %}selected{% endif %}>Aprobada</option>
+                        <option value="R" {% if request.GET.estado == 'R' %}selected{% endif %}>Rechazada</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="fecha_desde" class="form-label fw-bold">Fecha Desde</label>
+                    <input type="date" name="fecha_desde" id="fecha_desde" class="form-control" value="{{ request.GET.fecha_desde|default:'' }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-funnel me-1"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if justificaciones %}
+    <div class="card shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Alumno</th>
+                        <th>Curso</th>
+                        <th>Fechas</th>
+                        <th>Motivo</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for justificacion in justificaciones %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-person-circle me-2 text-muted"></i>
+                                {{ justificacion.alumno.get_full_name }}
+                            </div>
+                        </td>
+                        <td>{{ justificacion.curso.nombre }}</td>
+                        <td>
+                            <small class="text-muted d-block">Desde: <strong>{{ justificacion.fecha_inicial|date:"d/m/Y" }}</strong></small>
+                            <small class="text-muted d-block">Hasta: <strong>{{ justificacion.fecha_final|date:"d/m/Y" }}</strong></small>
+                        </td>
+                        <td>
+                            <span title="{{ justificacion.motivo }}">
+                                {{ justificacion.motivo|truncatewords:10 }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if justificacion.estado == 'P' %}
+                            <span class="badge bg-warning text-dark"><i class="bi bi-clock me-1"></i>Pendiente</span>
+                            {% elif justificacion.estado == 'A' %}
+                            <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Aprobada</span>
+                            {% elif justificacion.estado == 'R' %}
+                            <span class="badge bg-danger"><i class="bi bi-x-circle me-1"></i>Rechazada</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <div class="actions-cell">
+                            {% if justificacion.archivo_adjunto %}
+                            <a href="{{ justificacion.archivo_adjunto.url }}" class="btn btn-action btn-outline-info" title="Ver archivo" target="_blank">
+                                <i class="bi bi-paperclip"></i><span>Archivo</span>
+                            </a>
+                            {% endif %}
+                            {% if user.rol != 'alumno' %}
+                            <a href="{% url 'asistencia:responder_justificacion' justificacion.pk %}" class="btn btn-action btn-outline-primary" title="Responder">
+                                <i class="bi bi-reply"></i><span>Responder</span>
+                            </a>
+                            {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if is_paginated %}
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.alumno %}&alumno={{ request.GET.alumno }}{% endif %}{% if request.GET.curso %}&curso={{ request.GET.curso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}{% if request.GET.alumno %}&alumno={{ request.GET.alumno }}{% endif %}{% if request.GET.curso %}&curso={{ request.GET.curso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.alumno %}&alumno={{ request.GET.alumno }}{% endif %}{% if request.GET.curso %}&curso={{ request.GET.curso }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-inbox display-1 text-muted"></i>
+            <h5 class="text-muted mt-3">No se encontraron justificaciones</h5>
+            <p class="text-muted">No hay justificaciones registradas que coincidan con los filtros.</p>
+            <a href="{% url 'asistencia:crear_justificacion' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Crear Primera Justificacion
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

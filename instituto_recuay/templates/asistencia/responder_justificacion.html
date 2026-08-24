@@ -1,0 +1,144 @@
+﻿{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Responder Justificacion{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-reply-all me-2"></i>Responder Justificacion</h2>
+        <a href="{% url 'asistencia:lista_justificaciones' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Detalles de la Justificacion</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Alumno</small>
+                                <strong><i class="bi bi-person me-1"></i>{{ justificacion.alumno.get_full_name }}</strong>
+                                <br><small class="text-muted">{{ justificacion.alumno.codigo_estudiante|default:justificacion.alumno.dni }}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Curso</small>
+                                <strong><i class="bi bi-book me-1"></i>{{ justificacion.curso.codigo }} - {{ justificacion.curso.nombre }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Fecha Inicial</small>
+                                <strong><i class="bi bi-calendar-event me-1"></i>{{ justificacion.fecha_inicial|date:"d/m/Y" }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Fecha Final</small>
+                                <strong><i class="bi bi-calendar-check me-1"></i>{{ justificacion.fecha_final|date:"d/m/Y" }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Estado Actual</small>
+                                {% if justificacion.estado == 'P' %}
+                                <span class="badge bg-warning text-dark fs-6"><i class="bi bi-clock me-1"></i>Pendiente</span>
+                                {% elif justificacion.estado == 'A' %}
+                                <span class="badge bg-success fs-6"><i class="bi bi-check-circle me-1"></i>Aprobada</span>
+                                {% elif justificacion.estado == 'R' %}
+                                <span class="badge bg-danger fs-6"><i class="bi bi-x-circle me-1"></i>Rechazada</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Motivo</small>
+                                <p class="mb-0 mt-1">{{ justificacion.motivo }}</p>
+                            </div>
+                        </div>
+                        {% if justificacion.archivo_adjunto %}
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded">
+                                <small class="text-muted d-block">Archivo Adjunto</small>
+                                <a href="{{ justificacion.archivo_adjunto.url }}" class="btn btn-sm btn-outline-info mt-1" target="_blank">
+                                    <i class="bi bi-paperclip me-1"></i>{{ justificacion.archivo_adjunto.name|truncatechars:40 }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if justificacion.respuesta %}
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded border-start border-primary border-4">
+                                <small class="text-muted d-block">Respuesta Anterior</small>
+                                <p class="mb-0 mt-1">{{ justificacion.respuesta }}</p>
+                                {% if justificacion.respondido_por %}
+                                <small class="text-muted">Respondido por: {{ justificacion.respondido_por.get_full_name }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Formulario de Respuesta</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="id_estado" class="form-label fw-bold">
+                                    <i class="bi bi-flag me-1"></i>Estado <span class="text-danger">*</span>
+                                </label>
+                                <select name="estado" id="id_estado" class="form-select" required>
+                                    <option value="P" {% if request.POST.estado == 'P' or justificacion.estado == 'P' %}selected{% endif %}>Pendiente</option>
+                                    <option value="A" {% if request.POST.estado == 'A' or justificacion.estado == 'A' %}selected{% endif %}>Aprobada</option>
+                                    <option value="R" {% if request.POST.estado == 'R' or justificacion.estado == 'R' %}selected{% endif %}>Rechazada</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="id_respuesta" class="form-label fw-bold">
+                                    <i class="bi bi-chat-left-text me-1"></i>Respuesta <span class="text-danger">*</span>
+                                </label>
+                                <textarea name="respuesta" id="id_respuesta" class="form-control" rows="4"
+                                          placeholder="Ingrese su respuesta a la justificacion..."
+                                          required>{{ request.POST.respuesta|default:justificacion.respuesta }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'asistencia:lista_justificaciones' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-1"></i>Enviar Respuesta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

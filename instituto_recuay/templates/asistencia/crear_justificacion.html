@@ -1,0 +1,110 @@
+﻿{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Crear Justificacion{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-file-earmark-plus me-2"></i>Crear Justificacion</h2>
+        <a href="{% url 'asistencia:lista_justificaciones' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-text me-2"></i>Formulario de Justificacion</h5>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="id_curso" class="form-label fw-bold">
+                                    <i class="bi bi-book me-1"></i>Curso <span class="text-danger">*</span>
+                                </label>
+                                <select name="curso" id="id_curso" class="form-select" required>
+                                    <option value="">Seleccione un curso...</option>
+                                    {% for curso in cursos %}
+                                    <option value="{{ curso.pk }}" {% if request.POST.curso == curso.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ curso.codigo }} - {{ curso.nombre }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="id_fecha_inicial" class="form-label fw-bold">
+                                    <i class="bi bi-calendar-event me-1"></i>Fecha Inicial <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" name="fecha_inicial" id="id_fecha_inicial" class="form-control"
+                                       value="{{ request.POST.fecha_inicial|default:'' }}" required>
+                                <div class="form-text">Primera fecha de ausencia a justificar.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="id_fecha_final" class="form-label fw-bold">
+                                    <i class="bi bi-calendar-check me-1"></i>Fecha Final <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" name="fecha_final" id="id_fecha_final" class="form-control"
+                                       value="{{ request.POST.fecha_final|default:'' }}" required>
+                                <div class="form-text">Ultima fecha de ausencia a justificar.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="id_motivo" class="form-label fw-bold">
+                                    <i class="bi bi-chat-left-text me-1"></i>Motivo de la Justificacion <span class="text-danger">*</span>
+                                </label>
+                                <textarea name="motivo" id="id_motivo" class="form-control" rows="5"
+                                          placeholder="Describa detalladamente el motivo de su ausencia..."
+                                          required>{{ request.POST.motivo|default:'' }}</textarea>
+                                <div class="form-text">Explique claramente el motivo. Sea especifico y proporcionando detalles relevantes.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="id_archivo_adjunto" class="form-label fw-bold">
+                                    <i class="bi bi-paperclip me-1"></i>Archivo Adjunto (Opcional)
+                                </label>
+                                <input type="file" name="archivo_adjunto" id="id_archivo_adjunto" class="form-control"
+                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                <div class="form-text">Formatos permitidos: PDF, JPG, PNG, DOC, DOCX. TamaÃ±o maximo: 5MB.</div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <strong>Nota:</strong> Su justificacion sera evaluada por el administrador o docente responsable.
+                            Recibira una notificacion cuando sea revisada.
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'asistencia:lista_justificaciones' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-1"></i>Cancelar
+                            </a>
+                            <button type="reset" class="btn btn-outline-warning">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-1"></i>Enviar Justificacion
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

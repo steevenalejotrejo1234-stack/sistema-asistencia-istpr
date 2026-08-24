@@ -1,0 +1,66 @@
+﻿{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Carrera{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-mortarboard-fill me-2 text-danger"></i>Eliminar Carrera</h2>
+        <a href="{% url 'academica:lista_carreras' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-danger">
+        <div class="card-body">
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Advertencia:</strong> Esta accion no se puede deshacer. Se eliminara permanentemente la siguiente carrera.
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Informacion de la Carrera</h5>
+                    <table class="table table-borderless mb-0">
+                        <tr>
+                            <th width="150">Codigo:</th>
+                            <td>{{ carrera.codigo }}</td>
+                        </tr>
+                        <tr>
+                            <th>Nombre:</th>
+                            <td>{{ carrera.nombre }}</td>
+                        </tr>
+                        <tr>
+                            <th>Duracion:</th>
+                            <td>{{ carrera.duracion }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td>
+                                {% if carrera.estado %}
+                                <span class="badge bg-success">Activo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inactivo</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i>Confirmar Eliminacion
+                    </button>
+                    <a href="{% url 'academica:lista_carreras' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

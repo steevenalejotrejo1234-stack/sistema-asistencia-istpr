@@ -1,0 +1,309 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Panel del Docente{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1 fw-bold text-dark">
+                <i class="fas fa-chalkboard-teacher me-2 text-success"></i>Panel del Docente
+            </h2>
+            <p class="text-muted mb-0">Bienvenido, {{ user.get_full_name }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'asistencia:crear_sesion_qr' %}" class="btn btn-success">
+                <i class="fas fa-qrcode me-1"></i> Crear Sesion QR
+            </a>
+            <a href="{% url 'asistencia:registrar_asistencia' %}" class="btn btn-primary">
+                <i class="fas fa-clipboard-check me-1"></i> Registrar Asistencia Manual
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 55px; height: 55px; background: linear-gradient(135deg, #8e44ad, #6c3483);">
+                                <i class="fas fa-book-reader fa-lg text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1 fw-normal">Mis Asignaciones</h6>
+                            <h3 class="mb-0 fw-bold text-dark">{{ asignaciones.count|default:"0" }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 55px; height: 55px; background: linear-gradient(135deg, #27ae60, #1e8449);">
+                                <i class="fas fa-check-circle fa-lg text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1 fw-normal">Presentes Hoy</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #27ae60;">{{ presentes_hoy|default:"0" }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 55px; height: 55px; background: linear-gradient(135deg, #f39c12, #d68910);">
+                                <i class="fas fa-clock fa-lg text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1 fw-normal">Tardanzas Hoy</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #f39c12;">{{ tardanzas_hoy|default:"0" }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle" style="width: 55px; height: 55px; background: linear-gradient(135deg, #e74c3c, #c0392b);">
+                                <i class="fas fa-times-circle fa-lg text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="text-muted mb-1 fw-normal">Faltas Hoy</h6>
+                            <h3 class="mb-0 fw-bold" style="color: #e74c3c;">{{ faltas_hoy|default:"0" }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fas fa-qrcode me-2 text-success"></i>Sesiones QR Activas
+                        </h6>
+                        <a href="{% url 'asistencia:crear_sesion_qr' %}" class="btn btn-sm btn-success">
+                            <i class="fas fa-plus me-1"></i> Nueva Sesion
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    {% for sesion in sesiones_activas %}
+                    <div class="d-flex align-items-center justify-content-between p-3 mb-2 rounded-3" style="background-color: #f0faf4;">
+                        <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center justify-content-center rounded-circle me-3" style="width: 45px; height: 45px; background: linear-gradient(135deg, #27ae60, #1e8449);">
+                                <i class="fas fa-qrcode text-white"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-semibold">{{ sesion.curso.nombre }}</h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>Inicio: {{ sesion.hora_inicio|time:"H:i" }}
+                                    {% if sesion.hora_fin %} &middot; Fin: {{ sesion.hora_fin|time:"H:i" }}{% endif %}
+                                    &middot; Codigo: <strong>{{ sesion.codigo_validacion }}</strong>
+                                </small>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'asistencia:detalle_sesion_qr' pk=sesion.pk %}" class="btn btn-action btn-outline-primary">
+                                <i class="fas fa-eye"></i><span>Ver</span>
+                            </a>
+                            <a href="{% url 'asistencia:cerrar_sesion_qr' pk=sesion.pk %}" class="btn btn-action btn-outline-danger">
+                                <i class="fas fa-stop-circle"></i><span>Cerrar</span>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5 text-muted">
+                        <i class="fas fa-qrcode fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
+                        <h6>No hay sesiones QR activas hoy</h6>
+                        <p class="mb-3">Crea una nueva sesion para registrar asistencia de tus alumnos.</p>
+                        <a href="{% url 'asistencia:crear_sesion_qr' %}" class="btn btn-success">
+                            <i class="fas fa-plus me-1"></i> Crear Sesion QR
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-bolt me-2 text-warning"></i>Acciones Rapidas
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'asistencia:crear_sesion_qr' %}" class="btn btn-outline-success text-start py-3">
+                            <i class="fas fa-qrcode me-2"></i>
+                            <span>Crear Sesion QR</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'asistencia:registrar_asistencia' %}" class="btn btn-outline-primary text-start py-3">
+                            <i class="fas fa-clipboard-check me-2"></i>
+                            <span>Registrar Asistencia Manual</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'academica:lista_asignaciones' %}" class="btn btn-outline-secondary text-start py-3">
+                            <i class="fas fa-book me-2"></i>
+                            <span>Ver Mis Asignaciones</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'reportes:reporte_asistencias_pdf' %}" class="btn btn-outline-danger text-start py-3">
+                            <i class="fas fa-file-pdf me-2"></i>
+                            <span>Exportar Reporte PDF</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                        <a href="{% url 'asistencia:historial_asistencias' %}" class="btn btn-outline-info text-start py-3">
+                            <i class="fas fa-history me-2"></i>
+                            <span>Historial de Asistencias</span>
+                            <i class="fas fa-chevron-right float-end mt-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <h6 class="mb-0 fw-bold">
+                        <i class="fas fa-book me-2 text-primary"></i>Mis Cursos Asignados
+                    </h6>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 fw-semibold">Curso</th>
+                                    <th class="border-0 fw-semibold">Ciclo</th>
+                                    <th class="border-0 fw-semibold">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for asignacion in asignaciones %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">{{ asignacion.curso.nombre }}</div>
+                                        <small class="text-muted">{{ asignacion.curso.codigo }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">
+                                            Ciclo {{ asignacion.curso.ciclo.numero }}
+                                            ({{ asignacion.curso.ciclo.get_semestre_display }})
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success rounded-pill">Activa</span>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">
+                                        <i class="fas fa-book-open fa-2x mb-2 d-block" style="opacity: 0.3;"></i>
+                                        No tienes cursos asignados actualmente.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+                <div class="card-header bg-white border-0 pt-4 px-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fas fa-history me-2 text-primary"></i>Registros Recientes
+                        </h6>
+                        <a href="{% url 'asistencia:historial_asistencias' %}" class="btn btn-sm btn-outline-primary">
+                            Ver todo <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0 fw-semibold">Alumno</th>
+                                    <th class="border-0 fw-semibold">Curso</th>
+                                    <th class="border-0 fw-semibold">Fecha</th>
+                                    <th class="border-0 fw-semibold">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for registro in registros_recientes %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 12px; font-weight: 600;">
+                                                {{ registro.alumno.iniciales }}
+                                            </div>
+                                            <span>{{ registro.alumno.get_full_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ registro.curso.nombre }}</td>
+                                    <td>{{ registro.fecha|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% if registro.estado == 'P' %}
+                                            <span class="badge bg-success rounded-pill px-3 py-2">Presente</span>
+                                        {% elif registro.estado == 'T' %}
+                                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2">Tardanza</span>
+                                        {% elif registro.estado == 'F' %}
+                                            <span class="badge bg-danger rounded-pill px-3 py-2">Falta</span>
+                                        {% elif registro.estado == 'J' %}
+                                            <span class="badge bg-info rounded-pill px-3 py-2">Justificado</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary rounded-pill px-3 py-2">Permiso</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block" style="opacity: 0.3;"></i>
+                                        No hay registros recientes.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

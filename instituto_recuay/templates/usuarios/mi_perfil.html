@@ -1,0 +1,64 @@
+﻿{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-person-circle me-2"></i>Mi Perfil</h2>
+        <a href="{% url 'usuarios:cambiar_password' %}" class="btn btn-outline-warning">
+            <i class="bi bi-key me-1"></i>Cambiar Contrasena
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if user.foto %}
+                    <img src="{{ user.foto.url }}" alt="Foto de perfil" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                    <div class="mb-3">
+                        <i class="bi bi-person-circle display-1 text-primary"></i>
+                    </div>
+                    {% endif %}
+                    <h4 class="mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                    <p class="text-muted mb-2">{{ user.email }}</p>
+                    <span class="badge bg-info fs-6">{{ user.rol }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Editar Informacion</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="invalid-feedback d-block">{{ field.errors }}</div>
+                            {% endif %}
+                            {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-1"></i>Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
